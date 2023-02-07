@@ -1,22 +1,61 @@
-import React, { Component } from 'react';
-import { Route } from 'react-router';
-import { Layout } from './components/Layout';
-import { Home } from './components/Home';
-import { FetchData } from './components/FetchData';
-import { Counter } from './components/Counter';
+import "bootstrap/dist/css/bootstrap.min.css";
+import { useEffect, useState } from "react";
 
-import './custom.css'
+const App = () => {
+    const [tareas, setTareas] = useState([]);
 
-export default class App extends Component {
-  static displayName = App.name;
+    const mostrarTareas = async () => {
+        const response = await fetch("api/tarea/Lista");
 
-  render () {
+        if (response.ok) {
+            const data = await response.json();
+            setTareas(data);
+        } else {
+            console.log("status code:", response.status)
+        }
+    }
+
+    const formatDate = (string) => {
+        let options = { year: 'numeric', month: 'long', day: 'numeric' };
+        let fecha = new Date(string).toLocaleDateString("es-PE", options);
+        let hora = new Date(string).toLocaleTimeString();
+        return fecha + " | " + hora;
+    }
+
+    useEffect(() => {
+        mostrarTareas();
+    }, []);
+
     return (
-      <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/counter' component={Counter} />
-        <Route path='/fetch-data' component={FetchData} />
-      </Layout>
-    );
-  }
+        <div className="container bg-dark p-4 vh-100">
+
+            <h2 className="text-white">Lista de tareas</h2>
+            <div className="row">
+                <div className="col-sm-12">
+
+                </div>
+            </div>
+
+            <div className="row mt-4">
+                <div className="col-sm-12">
+                    <div className="list-group">
+                        {
+                            tareas.map((item) => (
+                                <div key={item.idTarea} className="list-group-item list-group-item-action">
+                                    <h5 className="text-primary">{item.descripcion}</h5>
+                                    <div className="d-flex justify-content-between">
+                                        <small className="text-muted">{formatDate(item.fechaRegistro)}</small>
+                                        <button className="btn btn-sm btn-outline-danger">Cerrar</button>
+                                    </div>
+                                </div>
+                            )
+                            )
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
+
+export default App;
