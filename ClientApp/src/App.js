@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 const App = () => {
     const [tareas, setTareas] = useState([]);
+    const [descripcion, setDescripcion] = useState("");
 
     const mostrarTareas = async () => {
         const response = await fetch("api/tarea/Lista");
@@ -26,13 +27,52 @@ const App = () => {
         mostrarTareas();
     }, []);
 
+    const guardarTarea = async (e) => {
+        e.preventDefault();
+
+        const response = await fetch("api/tarea/Guardar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json;charset=utf-8"
+            },
+            body: JSON.stringify({ descripcion: descripcion })
+        });
+
+        if (response.ok) {
+            setDescripcion("")
+            await mostrarTareas();
+        }
+    }
+
+    const cerrarTarea = async (id) => {
+
+        const response = await fetch("api/tarea/Cerrar/" + id, {
+            method: "DELETE"
+        });
+
+        if (response.ok) {
+            await mostrarTareas();
+        }
+    }
+
     return (
         <div className="container bg-dark p-4 vh-100">
 
             <h2 className="text-white">Lista de tareas</h2>
             <div className="row">
                 <div className="col-sm-12">
-
+                    <form onSubmit={guardarTarea}>
+                        <div className="input-group">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Ingrese la descripcion de la tarea"
+                                value={descripcion}
+                                onChange={(e) => setDescripcion(e.target.value)}
+                            />
+                            <button className="btn btn-success" type="submit" >Agregar</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -45,11 +85,15 @@ const App = () => {
                                     <h5 className="text-primary">{item.descripcion}</h5>
                                     <div className="d-flex justify-content-between">
                                         <small className="text-muted">{formatDate(item.fechaRegistro)}</small>
-                                        <button className="btn btn-sm btn-outline-danger">Cerrar</button>
+                                        <button
+                                            className="btn btn-sm btn-outline-danger"
+                                            onClick={() => cerrarTarea(item.idTarea)}
+                                        >
+                                            Cerrar
+                                        </button>
                                     </div>
                                 </div>
-                            )
-                            )
+                            ))
                         }
                     </div>
                 </div>
