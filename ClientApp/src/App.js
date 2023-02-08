@@ -1,12 +1,14 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
+import formatDate from "./utils/formatDate";
 
 const App = () => {
     const [tareas, setTareas] = useState([]);
     const [descripcion, setDescripcion] = useState("");
+    const ENDPOINT = "api/tarea/";
 
     const mostrarTareas = async () => {
-        const response = await fetch("api/tarea/Lista");
+        const response = await fetch(ENDPOINT + "Lista");
 
         if (response.ok) {
             const data = await response.json();
@@ -16,13 +18,6 @@ const App = () => {
         }
     }
 
-    const formatDate = (string) => {
-        let options = { year: 'numeric', month: 'long', day: 'numeric' };
-        let fecha = new Date(string).toLocaleDateString("es-PE", options);
-        let hora = new Date(string).toLocaleTimeString();
-        return fecha + " | " + hora;
-    }
-
     useEffect(() => {
         mostrarTareas();
     }, []);
@@ -30,7 +25,7 @@ const App = () => {
     const guardarTarea = async (e) => {
         e.preventDefault();
 
-        const response = await fetch("api/tarea/Guardar", {
+        const response = await fetch(ENDPOINT + "Guardar", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json;charset=utf-8"
@@ -46,7 +41,7 @@ const App = () => {
 
     const cerrarTarea = async (id) => {
 
-        const response = await fetch("api/tarea/Cerrar/" + id, {
+        const response = await fetch(ENDPOINT + "Cerrar/" + id, {
             method: "DELETE"
         });
 
